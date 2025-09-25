@@ -1,0 +1,47 @@
+#email (4137,3001 on training dataset)
+
+[1] "average leaf counts per tree"
+[1] 339.718
+horizontal mean load times = 43
+leafs = 169859
+vertical mean load times = 2
+
+# fetal (1700,21 on training dataset)
+[1] "average leaf counts per tree"
+[1] 115.19
+horizontal mean load times = 16
+leafs = 57595
+vertical mean load times = 1
+
+
+# gene ( 640,20531 on training dataset)
+[1] "average leaf counts per tree"
+[1] 20.214
+horizontal mean load times = 2
+leafs = 10107
+vertical mean load times = 1
+
+
+# mush ( 43228,8 on training dataset )
+[1] "average leaf counts per tree"
+[1] 1223.796
+horizontal mean load times = 152
+leafs = 611898
+vertical mean load times = 5
+
+# loan ( 3415,13 on training dataset )
+[1] "average leaf counts per tree"
+[1] 112.474
+horizontal mean load times = 15
+leafs = 56237
+vertical mean load times = 1
+
+
+#gesture ( 7898,32 on training dataset)
+# dataset provide from X-TIME
+[1] "average leaf counts per tree"
+[1] 1649.476
+horizontal mean load times = 203
+leafs = 824738
+vertical mean load times = 7
+
