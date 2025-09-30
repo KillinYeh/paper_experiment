@@ -1,0 +1,12 @@
+> mean(utilization_email$utilization)
+[1] 0.005550384
+> mean(utilization_fetal$utilization)
+[1] 0.3550217
+> mean(utilization_gene$utilization)
+[1] 0.0002550422
+> mean(utilization_mush$utilization)
+[1] 0.8731067
+> mean(utilization_loan$utilization)
+[1] 0.5451038
+> mean(utilization_gesture$utilization)
+[1] 0.3558137

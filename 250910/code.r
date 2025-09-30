@@ -69,3 +69,45 @@ print(mean(horizontal_gesture$per_tree_loads))
 #horizontal_covtype <- max_loads_forest(covtype_forest500 , caps=256)
 #print(horizontal_email$per_tree_loads)
 
+
+
+#----------------plot chart------------------
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 整理數據
+data = {
+    "dataset": ["email", "fetal", "gene", "mush", "loan", "gesture"],
+    "avg_leaf_per_tree": [339.718, 115.19, 20.214, 1223.796, 112.474, 1649.476],
+    "total_leafs": [169859, 57595, 10107, 611898, 56237, 824738],
+    "horizontal_mean_loads": [43, 16, 2, 152, 15, 203],
+    "vertical_mean_loads": [2, 1, 1, 5, 1, 7],
+}
+
+df = pd.DataFrame(data)
+
+# 顯示表格
+print(df)
+
+# 畫長條圖比較 horizontal vs vertical
+fig, ax = plt.subplots(figsize=(10,6))
+width = 0.35
+x = range(len(df))
+
+ax.bar([i - width/2 for i in x], df["horizontal_mean_loads"], width, label="Horizontal")
+ax.bar([i + width/2 for i in x], df["vertical_mean_loads"], width, label="Vertical")
+
+ax.set_xticks(x)
+ax.set_xticklabels(df["dataset"])
+ax.set_ylabel("Mean load times")
+ax.set_title("Horizontal vs Vertical CAM load times per dataset")
+ax.legend()
+
+plt.tight_layout()
+plt.show()
+
+# 也可以計算 horizontal/vertical 的比值
+df["horiz_to_vert_ratio"] = df["horizontal_mean_loads"] / df["vertical_mean_loads"]
+print("\nHorizontal / Vertical ratio:")
+print(df[["dataset", "horiz_to_vert_ratio"]])
+

@@ -1,0 +1,28 @@
+# The result of fixed column
+> mean(Tile_utilization_email$utilization)
+[1] 0.003601231
+> mean(Tile_utilization_fetal$utilization)
+[1] 0.01310416
+> mean(Tile_utilization_gene$utilization)
+[1] 1.993928e-05
+> mean(Tile_utilization_mush$utilization)
+[1] 0.02468446
+> mean(Tile_utilization_loan$utilization)
+[1] 0.0111371
+> mean(Tile_utilization_gesture$utilization)
+[1] 0.04093932
+
+
+# The result of adative column
+> mean(Tile_utilization_email$utilization)
+[1] 0.003601231
+> mean(Tile_utilization_fetal$utilization)
+[1] 0.1048333
+> mean(Tile_utilization_gene$utilization)
+[1] 1.993928e-05
+> mean(Tile_utilization_mush$utilization)
+[1] 0.7899027
+> mean(Tile_utilization_loan$utilization)
+[1] 0.1781936
+> mean(Tile_utilization_gesture$utilization)
+[1] 0.3275146

@@ -42,7 +42,7 @@ path_utilization_one_tree <- function(info, Nfeat) {
 
 # 對整個 forest 計算
 path_utilization_forest <- function(fit, data) {
-  Nfeat <- ncol(data) - 1  # 假設 data 最後一欄是 target
+  Nfeat <- ncol(data)
   res <- list()
   for (t in seq_len(fit$num.trees)) {
     info <- ranger::treeInfo(fit, t)
@@ -58,19 +58,55 @@ utilization_email = path_utilization_forest(email_forest500 , email.x)
 mean(utilization_email$utilization)
 
 utilization_fetal = path_utilization_forest(fetal_forest , fetal_x)
-mean(utilization_email$utilization)
+mean(utilization_fetal$utilization)
 
 utilization_gene = path_utilization_forest(gene_forest500 , gene_train_x)
-mean(utilization_email$utilization)
+mean(utilization_gene$utilization)
 
 utilization_mush = path_utilization_forest(mush_forest500 , mush.x)
-mean(utilization_email$utilization)
+mean(utilization_mush$utilization)
 
 utilization_loan = path_utilization_forest(loan_forest500 , loan_train_x)
-mean(utilization_email$utilization)
+mean(utilization_loan$utilization)
 
 utilization_gesture = path_utilization_forest(gesture_forest500 , gesture_train_x)
-mean(utilization_email$utilization)
+mean(utilization_gesture$utilization)
 
 
+
+#--------------------plot chart ----------------------
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 整理你的數據
+data = {
+    "dataset": ["email", "fetal", "gene", "mush", "loan", "gesture"],
+    "mean_utilization": [
+        0.005550384,
+        0.3550217,
+        0.0002550422,
+        0.8731067,
+        0.5451038,
+        0.3558137,
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# 畫柱狀圖
+plt.figure(figsize=(8,5))
+bars = plt.bar(df["dataset"], df["mean_utilization"], color="skyblue", edgecolor="black")
+
+plt.title("Average CAM Row Utilization per Dataset")
+plt.ylabel("Mean Utilization (used features / total features)")
+plt.xlabel("Dataset")
+
+# 在柱子上標出數值
+for bar, val in zip(bars, df["mean_utilization"]):
+    plt.text(bar.get_x() + bar.get_width()/2, bar.get_height(),
+             f"{val:.3f}", ha="center", va="bottom", fontsize=9)
+
+plt.ylim(0, 1.1)  # 因為最大值接近 1
+plt.tight_layout()
+plt.show()
 
