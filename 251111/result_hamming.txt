@@ -1,0 +1,32 @@
+pvn_fetal$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                          1221
+2 proposed                          1432
+:pvn_gene$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                        328416
+2 proposed                        328417
+pvn_email$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                        799773
+2 proposed                        800552
+pvn_fetal$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                          1221
+2 proposed                          1432
+pvn_gene$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                        328416
+2 proposed                        328417
+pvn_mush$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                           963
+2 proposed                          1068
+pvn_loan$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                           445
+2 proposed                           579
+pvn_gesture$total_closed_cols_all_windows
+    method total_closed_cols_all_windows
+1    naive                         26536
+2 proposed                         30164
