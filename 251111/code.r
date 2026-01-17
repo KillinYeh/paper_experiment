@@ -294,13 +294,30 @@ proposed_vs_naive_main <- function(fit, data, one_based = TRUE) {
 
 pvn_email <- proposed_vs_naive_main(email_forest100,email.x)
 pvn_email$total_closed_cols_all_windows
+print(pvn_email$wlbl_total)
+print(pvn_email$hamming_summary)
+
 pvn_fetal <- proposed_vs_naive_main(fetal_forest100,fetal_x)
 pvn_fetal$total_closed_cols_all_windows
+print(pvn_fetal$wlbl_total)
+print(pvn_fetal$hamming_summary)
+
 pvn_gene  <- proposed_vs_naive_main(gene_forest100,gene_train_x)
 pvn_gene$total_closed_cols_all_windows
+print(pvn_gene$wlbl_total)
+print(pvn_gene$hamming_summary)
+
 pvn_mush  <- proposed_vs_naive_main(mush_forest100,mush.x)
 pvn_mush$total_closed_cols_all_windows
+print(pvn_mush$wlbl_total)
+print(pvn_mush$hamming_summary)
+
 pvn_loan  <- proposed_vs_naive_main(loan_forest100,loan_train_.x)
 pvn_loan$total_closed_cols_all_windows
+print(pvn_loan$wlbl_total)
+print(pvn_loan$hamming_summary)
+
 pvn_gesture <- proposed_vs_naive_main(gesture_forest100,gesture_train_x)
 pvn_gesture$total_closed_cols_all_windows
+print(pvn_gesture$wlbl_total)
+print(pvn_gesture$hamming_summary)

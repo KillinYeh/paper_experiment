@@ -17,3 +17,7 @@ In the `code_hamming.r` , I try to
 1. Using all of the feature and find the path which have the smallest path length to be first path, ==instead of top 128 frequently used feature==
 2. find the paths which are head 127 shortest hamming distance within ==all of the feature==.
 3. calculate the number of four situations ( WL/BL , open/closed).  
+
+
+## Result 
+pvn_${dataset}$cell_oo_all = In the window(128*feature, not in a "tile") , how many WL/BL of cells are both open , and ox means WL/BL = open/close

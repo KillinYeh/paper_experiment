@@ -1,0 +1,89 @@
+#------------------ Result (When tile size equal to 128*128)------------------
+fetal		oo		ox		xo		xx
+
+optimal	      3.92e+08		1.3e+07		0		0
+naive	      4.01e+08		7.83e+06	0		0
+
+gene
+
+optimal	      3.02e+07		3.79e+08	4.67e+07	6.13e+09
+naive	      3.26e+07		3.77e+08	4.95e+07	6.12e+09
+
+gesture
+
+optimal	      1.04e+10		2.53e+07	0		0
+naive  	      1.04e+10		3.54e+06	0		0
+
+gas
+
+optimal	      7.05e+09		1.47e+09	0		0
+naive	      7.44e+09		1.08e+09	0		0
+
+email
+
+optimal	      3.65e+09		2.75e+09	7.30e+09	9.26e+10
+naive	      4.41e+09		1.99e+09	1.16e+10	8.83e+10
+
+mush
+
+optimal	      9.62e+09		1.04e+09	0		0
+naive	      1.07e+10		1.38e+06	0		0
+
+loan
+
+optimal	      9.93e+07		4.15e+06	0		0
+naive	      1.02e+08		1.09e+06	0		0
+
+===== Sum of oo + ox + xo + xx =====
+fetal    optimal = 4.050e+08   naive = 4.088e+08
+gene     optimal = 6.586e+09   naive = 6.579e+09
+gesture  optimal = 1.043e+10   naive = 1.040e+10
+gas      optimal = 8.520e+09   naive = 8.520e+09
+email    optimal = 1.063e+11   naive = 1.063e+11
+mush     optimal = 1.066e+10   naive = 1.070e+10
+loan     optimal = 1.034e+08   naive = 1.031e+08
+
+#------------------ Result (When tile size equal to 16*16)--------------------
+fetal		oo		ox		xo		xx
+
+optimal	      2.46e+08		6.67e+07	2.95e+07	6.5e+07
+naive	      2.84e+08		2.96e+07	4.26e+07	5.19e+07
+
+gene
+
+optimal	      2.7e+06		3.86e+08	5.82e+07	6.19e+09
+naive	      4.22e+06		3.85e+08	7.88e+07	6.18e+09
+
+gesture
+
+optimal	      4.34e+09		1.31e+09	2.7e+09		2.06e+09
+naive  	      4.72e+09		9.33e+08	3.43e+09	1.33e+09
+
+gas
+
+optimal	      7.81e+08		1.47e+09	1.15e+09	5.12e+09
+naive	      1.01e+09		1.24e+09	1.64e+09	4.63e+09
+
+email
+
+optimal	      4.25e+08		3.22e+09	1.16e+09	1.02e+11
+naive	      8.04e+08		2.84e+09	2.54e+09	1e+11
+
+mush
+
+optimal	      9.37e+09		1.29e+09	0		0
+naive	      1.03e+10		3.05e+08	0		0
+
+loan
+
+optimal	      7.16e+08		3.19e+08	0		0
+naive	      9.03e+08		1.31e+08	0		0
+
+===== Sum of oo + ox + xo + xx (tile size = 16x16) =====
+fetal    optimal = 4.072e+08   naive = 4.081e+08
+gene     optimal = 6.637e+09   naive = 6.648e+09
+gesture  optimal = 1.041e+10   naive = 1.041e+10
+gas      optimal = 8.521e+09   naive = 8.520e+09
+email    optimal = 1.068e+11   naive = 1.062e+11
+mush     optimal = 1.066e+10   naive = 1.060e+10
+loan     optimal = 1.035e+09   naive = 1.034e+09

@@ -1,32 +1,86 @@
-pvn_fetal$total_closed_cols_all_windows
-    method total_closed_cols_all_windows
-1    naive                          1221
-2 proposed                          1432
-:pvn_gene$total_closed_cols_all_windows
-    method total_closed_cols_all_windows
-1    naive                        328416
-2 proposed                        328417
 pvn_email$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                        799773
-2 proposed                        800552
+1    naive                        683336
+2 proposed                        721464
+> print(pvn_email$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive    10104980    14250860     5354578    73022815
+2 proposed     7368311    16987529     3211786    75165607
+> print(pvn_email$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                   4                     30                  90
+2 proposed                   4                     23                  90
+ 
+
 pvn_fetal$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                          1221
-2 proposed                          1432
+1    naive                            36
+2 proposed                            74
+> print(pvn_fetal$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive      235653        4608           0           0
+2 proposed      230868        9393           0           0
+> print(pvn_fetal$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                   3                      8                  14
+2 proposed                   3                      5                  13
+
+
+ 
 pvn_gene$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                        328416
-2 proposed                        328417
+1    naive                        324415
+2 proposed                        324659
+> print(pvn_gene$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive      262457      692935      247371    39674458
+2 proposed      243682      711710      234458    39687371
+> print(pvn_gene$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                 4.0                   10.5                18.0
+2 proposed                 4.0                   10.0                18.0
+
+
+ 
 pvn_mush$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                           963
-2 proposed                          1068
+1    naive                             1
+2 proposed                           753
+> print(pvn_mush$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive      986512         128           0           0
+2 proposed      890256       96384           0           0
+> print(pvn_mush$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                   0                      2                   6
+2 proposed                   0                      0                   2
+
+
+ 
 pvn_loan$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                           445
-2 proposed                           579
+1    naive                            10
+2 proposed                            38
+> print(pvn_loan$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive      119932        1280           0           0
+2 proposed      116348        4864           0           0
+> print(pvn_loan$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                   0                      4                   8
+2 proposed                   1                      3                   7
+ 
+
+
 pvn_gesture$total_closed_cols_all_windows
     method total_closed_cols_all_windows
-1    naive                         26536
-2 proposed                         30164
+1    naive                            14
+2 proposed                           100
+> print(pvn_gesture$wlbl_total)
+    method cell_oo_all cell_ox_all cell_xo_all cell_xx_all
+1    naive     5270592        1792           0           0
+2 proposed     5259584       12800           0           0
+> print(pvn_gesture$hamming_summary)
+    method ham_dis_in_tile.min ham_dis_in_tile.median ham_dis_in_tile.max
+1    naive                   3                     12                  22
+2 proposed                   3                      6                  17
