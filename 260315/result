@@ -1,0 +1,168 @@
+# running time simulation by R::system.time()
+
+## email
+
+                  Method Elapsed_Time_sec
+elapsed              Seq            0.042
+elapsed1  Naive (X-Time)            0.043
+elapsed2             MCP            0.112
+elapsed3   Radix + Union           40.072
+elapsed4  LSH (Adaptive)            0.622
+elapsed5 FP-Tree + Union           42.384
+elapsed6    Global Union         1419.323
+
+## fetal
+
+elapsed              Seq            0.013
+elapsed1  Naive (X-Time)            0.012
+elapsed2             MCP            0.020
+elapsed3   Radix + Union            8.541
+elapsed4  LSH (Adaptive)            0.232
+elapsed5 FP-Tree + Union            8.880
+elapsed6    Global Union          105.727
+
+
+## gene
+
+elapsed              Seq            0.004
+elapsed1  Naive (X-Time)            0.002
+elapsed2             MCP            0.005
+elapsed3   Radix + Union            1.657
+elapsed4  LSH (Adaptive)            0.036
+elapsed5 FP-Tree + Union            1.696
+elapsed6    Global Union            4.113
+
+## mush
+
+elapsed              Seq            0.144
+elapsed1  Naive (X-Time)            0.141
+elapsed2             MCP            0.213
+elapsed3   Radix + Union           91.141
+elapsed4  LSH (Adaptive)            2.517
+elapsed5 FP-Tree + Union           95.736
+elapsed6    Global Union        12035.147
+
+## loan
+
+elapsed              Seq            0.013
+elapsed1  Naive (X-Time)            0.011
+elapsed2             MCP            0.017
+elapsed3   Radix + Union            7.046
+elapsed4  LSH (Adaptive)            0.201
+elapsed5 FP-Tree + Union            7.436
+elapsed6    Global Union           78.298
+
+## gesture
+
+elapsed              Seq            0.186
+elapsed1  Naive (X-Time)            0.199
+elapsed2             MCP            0.342
+elapsed3   Radix + Union          141.251
+elapsed4  LSH (Adaptive)            3.511
+elapsed5 FP-Tree + Union          164.927
+elapsed6    Global Union        24861.143
+
+
+## arcene
+
+elapsed              Seq            0.004
+elapsed1  Naive (X-Time)            0.001
+elapsed2             MCP            0.002
+elapsed3   Radix + Union            0.753
+elapsed4  LSH (Adaptive)            0.019
+elapsed5 FP-Tree + Union            0.804
+elapsed6    Global Union            1.122
+
+## gas
+
+elapsed              Seq            0.020
+elapsed1  Naive (X-Time)            0.021
+elapsed2             MCP            0.050
+elapsed3   Radix + Union           16.991
+elapsed4  LSH (Adaptive)            0.338
+elapsed5 FP-Tree + Union           18.418
+elapsed6    Global Union          342.776
+
+
+
+# running time simulation by R::bench()
+# email
+
+1             Seq    0.042
+2  Naive (X-Time)    0.045
+3             MCP    0.122
+4   Radix + Union   40.496
+5  LSH (Adaptive)    0.628
+6 FP-Tree + Union   41.800
+7    Global Union 1440.681  
+
+# fetal
+
+1             Seq    0.014
+2  Naive (X-Time)    0.013
+3             MCP    0.021
+4   Radix + Union    8.489
+5  LSH (Adaptive)    0.242
+6 FP-Tree + Union    8.852
+7    Global Union  106.073
+
+# gene
+
+1             Seq    0.003
+2  Naive (X-Time)    0.003
+3             MCP    0.005
+4   Radix + Union    1.654
+5  LSH (Adaptive)    0.036
+6 FP-Tree + Union    1.680
+7    Global Union    4.168
+
+# mush
+
+1             Seq     0.138
+2  Naive (X-Time)     0.146
+3             MCP     0.217
+4   Radix + Union    92.502
+5  LSH (Adaptive)     2.565
+6 FP-Tree + Union    96.122
+7    Global Union 12270.111
+
+
+# loan
+
+1             Seq    0.012
+2  Naive (X-Time)    0.011
+3             MCP    0.017
+4   Radix + Union    7.154
+5  LSH (Adaptive)    0.209
+6 FP-Tree + Union    7.293
+7    Global Union   79.603
+ 
+# gesture
+
+1             Seq     0.195
+2  Naive (X-Time)     0.208
+3             MCP     0.355
+4   Radix + Union   143.210
+5  LSH (Adaptive)     3.640
+6 FP-Tree + Union   163.222
+7    Global Union 24528.898
+
+# arcene
+
+1             Seq    0.003
+2  Naive (X-Time)    0.002
+3             MCP    0.003
+4   Radix + Union    0.753
+5  LSH (Adaptive)    0.020
+6 FP-Tree + Union    0.763
+7    Global Union    1.124
+
+# gas
+
+1             Seq    0.020
+2  Naive (X-Time)    0.020
+3             MCP    0.051
+4   Radix + Union   17.263
+5  LSH (Adaptive)    0.352
+6 FP-Tree + Union   18.272
+7    Global Union  344.969

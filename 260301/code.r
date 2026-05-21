@@ -1,6 +1,84 @@
-############################################################
-## 0. 基礎工具
-############################################################
+calculate_tile_purity <- function(res_static) {
+  # 檢查輸入
+  if (is.null(res_static) || is.null(res_static$row_tiles)) {
+    stop("Input error: res_static must contain 'row_tiles'.")
+  }
+  
+  df <- res_static$row_tiles
+  
+  # 我們要對每一列 (每一個 Tile) 進行計算
+  # 回傳一個詳細的 Data Frame
+  
+  purity_list <- lapply(seq_len(nrow(df)), function(i) {
+    
+    # 1. 取得該 Tile 內所有 Path 所屬的 Tree ID
+    # tree_ids_in_tile 是一個 list-column，所以要用 [[i]] 取出向量
+    t_ids <- unlist(df$tree_ids_in_tile[[i]])
+    
+    # 防呆：如果 Tile 是空的 (雖然不應該發生)
+    if (length(t_ids) == 0) {
+      return(data.frame(
+        method = df$method[i],
+        tile_id = df$tile_id[i],
+        dominant_tree = NA,
+        max_count = 0,
+        total_count = 0,
+        ratio = 0
+      ))
+    }
+    
+    # 2. 統計頻率 (Frequency Count)
+    # table() 會計算每個 Tree ID 出現幾次
+    counts <- table(t_ids)
+    
+    # 3. 找出最大值 (Most Frequent)
+    max_count <- max(counts)
+    
+    # 找出是哪一棵樹 (如果有平手，取第一個)
+    dom_tree <- names(counts)[which.max(counts)]
+    
+    # 4. 計算總數 (其實就是 length(t_ids) 或 rows_in_tile)
+    total_count <- sum(counts)
+    
+    # 5. 計算比例
+    ratio <- max_count / total_count
+    
+    data.frame(
+      method = df$method[i],
+      tile_id = df$tile_id[i],
+      dominant_tree = as.integer(dom_tree),
+      max_count = as.integer(max_count),
+      total_count = as.integer(total_count),
+      ratio = ratio
+    )
+  })
+  
+  # 合併成大表格
+  purity_df <- do.call(rbind, purity_list)
+  
+  # --- 輸出統計報告 ---
+  cat("========================================\n")
+  cat("       Tile Purity Analysis Report      \n")
+  cat("   (Ratio of Dominant Tree in Tile)     \n")
+  cat("========================================\n")
+  
+  methods <- unique(purity_df$method)
+  
+  for (m in methods) {
+    sub_df <- purity_df[purity_df$method == m, ]
+    avg_ratio <- mean(sub_df$ratio)
+    median_ratio <- median(sub_df$ratio)
+    
+    cat(sprintf("Method: %-10s\n", m))
+    cat(sprintf("  - Mean Purity   : %.4f\n", avg_ratio))
+    cat(sprintf("  - Median Purity : %.4f\n", median_ratio))
+    cat(sprintf("  - Min / Max     : %.4f / %.4f\n", min(sub_df$ratio), max(sub_df$ratio)))
+    cat("----------------------------------------\n")
+  }
+  
+  return(purity_df)
+}
+
 
 progress_bar <- function(current, total, len = 50) {
   percent <- current / total
@@ -144,17 +222,38 @@ build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
 }
 
 ############################################################
-## 2. Row Grouping (Only Sequential)
+## 2. Row Grouping (radix sort / LSH)
 ############################################################
-
-# 這是唯一保留的分組邏輯：依序切分
-pack_all_tiles_sequential <- function(paths_ranked, tile_rows = 128L) {
+pack_all_tiles_tries <- function(paths_ranked, tile_rows = 128L) {
   n_paths <- length(paths_ranked)
-  # 直接按 1..N 切分，不進行排序
-  order_rows <- seq_len(n_paths)
+  n_features <- attr(paths_ranked, "n_features")
   
-  group_idx <- (order_rows - 1L) %/% tile_rows + 1L
-  chunks <- split(order_rows, group_idx)
+  # 記憶體與速度優化：只取最高頻的前 N 個特徵來做前綴排序
+  # 由於 Tile 寬度就是 128，更後面的特徵對「前綴」的影響力微乎其微
+  max_prefix_len <- min(n_features, 128L) 
+  
+  cat("    -> Building Bit Matrix for Radix Sort...\n")
+  mat <- matrix(0L, nrow = n_paths, ncol = max_prefix_len)
+  
+  for (i in seq_len(n_paths)) {
+    feats <- paths_ranked[[i]]
+    # 只標記在前 max_prefix_len 範圍內的特徵
+    valid_feats <- feats[feats <= max_prefix_len]
+    if (length(valid_feats) > 0) {
+      mat[i, valid_feats] <- 1L
+    }
+  }
+  
+  df_mat <- as.data.frame(mat)
+  
+  # 執行全域字典序排序 (Radix Sort)
+  cat("    -> Executing fast Radix Sort...\n")
+  # decreasing = TRUE 代表優先將有使用該特徵(1)的排在一起
+  order_idx <- do.call(order, c(df_mat, list(decreasing = TRUE, method = "radix")))
+  
+  # 依序切分成 Tiles
+  group_idx <- (seq_len(n_paths) - 1L) %/% tile_rows + 1L
+  chunks <- split(order_idx, group_idx)
   
   do.call(rbind, lapply(names(chunks), function(nm) {
     rows <- chunks[[nm]]
@@ -165,7 +264,161 @@ pack_all_tiles_sequential <- function(paths_ranked, tile_rows = 128L) {
 }
 
 ############################################################
-## 3. 核心比較邏輯 (修改為只跑 Sequential)
+## 2.2 Row Grouping (LSH / MinHash)
+############################################################
+pack_all_tiles_lsh <- function(paths_ranked, tile_rows = 128L, num_hash = 15L) {
+  n_paths <- length(paths_ranked)
+  n_features <- attr(paths_ranked, "n_features")
+  # 自動適應邏輯：特徵越多 (越稀疏)，條件要越寬鬆 (num_hash 越小)
+  if (n_features > 1000) {
+    num_hash <- 1L      # Gene, Email
+  } else if (n_features > 50) {
+    num_hash <- 2L      # Gas
+  } else {
+    num_hash <- 4L      # Gesture, Fetal, Loan, Mush
+  }
+  
+  cat("    -> Generating MinHash Signatures...\n")
+  set.seed(42) # 固定 seed 以利實驗重現
+  
+  # 產生 num_hash 組隨機排列的特徵 ID (Hash Functions)
+  hash_funcs <- replicate(num_hash, sample.int(n_features))
+  
+  signatures <- character(n_paths)
+  for (i in seq_len(n_paths)) {
+    feats <- paths_ranked[[i]]
+    if (length(feats) == 0) {
+      signatures[i] <- "empty"
+    } else {
+      # MinHash 核心邏輯：找出當前路徑的特徵中，在每個隨機排列裡最靠前的 Index
+      sig <- apply(hash_funcs[feats, , drop = FALSE], 2, min)
+      signatures[i] <- paste(sig, collapse = "_")
+    }
+  }
+  
+  cat("    -> Grouping by LSH Buckets...\n")
+  # 根據 Hash Bucket (Signature) 進行全域排序，讓相似的路徑排在一起
+  order_idx <- order(signatures)
+  
+  # 依序切分成 Tiles
+  group_idx <- (seq_len(n_paths) - 1L) %/% tile_rows + 1L
+  chunks <- split(order_idx, group_idx)
+  
+  do.call(rbind, lapply(names(chunks), function(nm) {
+    rows <- chunks[[nm]]
+    df <- data.frame(tile_id = as.integer(nm), rows_in_tile = length(rows))
+    df$rows_idx <- I(list(rows))
+    df
+  }))
+}
+
+############################################################
+## 2.3 Row Grouping (Radix Sort + Union Sliding Window)
+############################################################
+
+pack_all_tiles_radix_union <- function(paths_ranked, tile_rows = 128L, window_size = 512L) {
+  n_paths <- length(paths_ranked)
+  n_features <- attr(paths_ranked, "n_features")
+  
+  # --- Step 1: Radix Sort (全域前綴排序) ---
+  # 為了速度與記憶體，只取最高頻的前 128 個特徵來做前綴排序
+  max_prefix_len <- min(n_features, 128L) 
+  
+  cat("    -> Building Bit Matrix for Radix Sort...\n")
+  mat <- matrix(0L, nrow = n_paths, ncol = max_prefix_len)
+  
+  for (i in seq_len(n_paths)) {
+    feats <- paths_ranked[[i]]
+    valid_feats <- feats[feats <= max_prefix_len]
+    if (length(valid_feats) > 0) mat[i, valid_feats] <- 1L
+  }
+  
+  df_mat <- as.data.frame(mat)
+  
+  cat("    -> Executing fast Radix Sort...\n")
+  # 進行全域字典序排序，得到排列好的 index
+  order_idx <- do.call(order, c(df_mat, list(decreasing = TRUE, method = "radix")))
+  
+  # --- Step 2: Sliding Window + Union Best-Fit ---
+  cat(sprintf("    -> Packing tiles with Sliding Window (size=%d)...\n", window_size))
+  
+  unassigned_idx <- order_idx
+  res_tiles <- list()
+  tile_counter <- 1L
+  
+  # 使用 progress bar 追蹤進度
+  total_tiles_estimate <- ceiling(n_paths / tile_rows)
+  
+  while (length(unassigned_idx) > 0) {
+    # 1. 圈出當前的滑動視窗 (最多 window_size 個)
+    current_window_size <- min(length(unassigned_idx), window_size)
+    window_pool <- unassigned_idx[1:current_window_size]
+    
+    if (length(window_pool) <= tile_rows) {
+      # 如果剩下的路徑不夠裝滿一個 Tile，就全部打包
+      selected_for_tile <- window_pool
+      unassigned_idx <- unassigned_idx[-(1:length(selected_for_tile))]
+    } else {
+      # 2. 挑選 Base Path (視窗內長度最短的 Path)
+      path_lengths <- lengths(paths_ranked[window_pool])
+      base_local_idx <- which.min(path_lengths)
+      base_idx <- window_pool[base_local_idx]
+      
+      selected_for_tile <- integer(tile_rows)
+      selected_for_tile[1] <- base_idx
+      current_mask <- paths_ranked[[base_idx]]
+      
+      # 將 Base 移出候選池
+      window_pool <- window_pool[-base_local_idx]
+      
+      # 3. 貪婪尋找剩下的 127 條路徑 (Best-Fit)
+      for (k in 2:tile_rows) {
+        # 計算視窗內每個 candidate 加入後，會新增多少個 1 (Cost)
+        # sum(!(candidate %in% mask)) 就是增加的特徵數量
+        costs <- vapply(window_pool, function(idx) {
+          sum(!(paths_ranked[[idx]] %in% current_mask))
+        }, numeric(1))
+        
+        # 找出 Cost 最小的 candidate (若平手會自動選視窗中最前面的，也就是前綴最像的)
+        best_local_idx <- which.min(costs)
+        best_idx <- window_pool[best_local_idx]
+        
+        # 加入 Tile 並更新 Mask
+        selected_for_tile[k] <- best_idx
+        current_mask <- unique(c(current_mask, paths_ranked[[best_idx]]))
+        
+        # 將選中的人移出當前候選池
+        window_pool <- window_pool[-best_local_idx]
+      }
+      
+      # 4. 將這 128 個被選中的人，從全域的未分配名單中移除
+      # 注意：R 的 setdiff 會自動保留 unassigned_idx 原本的排序，完美維持 Radix Sort 的效果
+      unassigned_idx <- setdiff(unassigned_idx, selected_for_tile)
+    }
+    
+    # 紀錄這個 Tile 的資訊
+    res_tiles[[tile_counter]] <- data.frame(
+      tile_id = tile_counter, 
+      rows_in_tile = length(selected_for_tile)
+    )
+    res_tiles[[tile_counter]]$rows_idx <- I(list(selected_for_tile))
+    
+    if (tile_counter %% 10 == 0) {
+       progress_bar(min(tile_counter, total_tiles_estimate), total_tiles_estimate)
+    }
+    tile_counter <- tile_counter + 1L
+  }
+  progress_bar(total_tiles_estimate, total_tiles_estimate)
+  
+  do.call(rbind, res_tiles)
+}
+
+
+
+
+
+############################################################
+## 3. 核心比較邏輯 
 ############################################################
 
 compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, path_tree_id, leaf_ids_list) {
@@ -176,12 +429,22 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   paths_ranked <- remap_paths_to_rank(paths_list, ord, one_based = one_based)
   attr(paths_ranked, "n_features") <- n_features
   
-  cat("Packing tiles (Sequential only)...\n")
+  cat("Packing tiles (tries (radix sort) / LSH)...\n")
   progress_bar(2, 5)
+  #cat("[Method 2] Tries (Radix Sort)...\n")
+  #tries_df <- pack_all_tiles_tries(paths_ranked)
+  #tries_df$method <- "tries_radix"
+
+  #cat("[Method 3] LSH (MinHash)...\n")
+  #lsh_df <- pack_all_tiles_lsh(paths_ranked, num_hash = 15L)
+  #lsh_df$method <- "lsh_minhash"
   
-  # 2. Grouping: 僅執行 Sequential
-  seq_df <- pack_all_tiles_sequential(paths_ranked)
-  seq_df$method <- "sequential"
+  cat("\n[Method 2] Radix + Union (Window=512)...\n")
+  radix_union_df <- pack_all_tiles_radix_union(paths_ranked, tile_rows = 128L, window_size = 512L)
+  radix_union_df$method <- "radix_union"
+
+
+
   
   # 附加 Meta Info
   append_meta <- function(df) {
@@ -192,7 +455,9 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   
   # 這裡只會有 sequential 的結果
   all_row_tiles <- rbind(
-    append_meta(seq_df)
+  #  append_meta(tries_df),
+  #  append_meta(lsh_df),
+     append_meta(radix_union_df)
   )
   
   cat("build physical tile\n")
@@ -261,6 +526,8 @@ precompute_bl_info <- function(physical_tiles) {
   row.names(bl_vec) <- physical_tiles$key
   bl_vec
 }
+
+
 
 simulate_cam_array_mismatch <- function(fit, data_test, res, leaf_info_list, tile_cols = 128L) {
   row_tiles    <- res$row_tiles
@@ -478,5 +745,11 @@ sim_gesture <- main_simulation(gesture_forest100,gesture_test_x)
 sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
   
 sim_gas <- main_simulation(gas_forest100,gas_test_x)
+
+#save.image(file = "backup_tries_lsh_size128_20260301.RData")
+#save.image(file = "backup_lsh_with_adaptive_hash_size_20260301.RData")
+save.image(file = "backup_union_radix_20260301.RData")
+
+
 
 sim_cov <- main_simulation(cov_forest_100,cov_test_x)

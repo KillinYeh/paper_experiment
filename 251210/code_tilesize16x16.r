@@ -72,7 +72,7 @@ wlbl_stats_for_window <- function(paths_ranked, rows_idx, start, end) {
   )
 }
 
-closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_cols = 128L) {
+closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_cols = 16L) {
   n_features <- attr(paths_ranked, "n_features")
   if (n_features <= 0L) return(c(closed = 0L, total = 0L))
   
@@ -96,7 +96,7 @@ closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_col
   c(closed = total_closed, total = total_cols)
 }
 
-build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
+build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 16L) {
   n_features <- attr(paths_ranked, "n_features")
   if (n_features <= 0L || nrow(row_tiles) == 0L) return(NULL)
   
@@ -129,7 +129,7 @@ build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
 ## 2. Row Grouping (Proposed / Naive)
 ############################################################
 
-pack_all_tiles_proposed <- function(paths_ranked, tile_rows = 128L, tile_cols = 128L) {
+pack_all_tiles_proposed <- function(paths_ranked, tile_rows = 16L, tile_cols = 16L) {
   # 簡單實作：以全域長度當種子，用 Hamming 找最近鄰
   idx_full <- lapply(paths_ranked, function(v) if (!length(v)) integer(0L) else unique(as.integer(v)))
   len_full <- vapply(idx_full, length, integer(1))
@@ -168,7 +168,7 @@ pack_all_tiles_proposed <- function(paths_ranked, tile_rows = 128L, tile_cols = 
   do.call(rbind, tiles)
 }
 
-pack_all_tiles_naive <- function(paths_ranked, tile_rows = 128L, tile_cols = 128L) {
+pack_all_tiles_naive <- function(paths_ranked, tile_rows = 16L, tile_cols = 16L) {
   lens <- vapply(paths_ranked, length, integer(1))
   order_rows <- order(lens, decreasing = FALSE)
   
@@ -218,7 +218,7 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   cat("build physical tile\n")
   progress_bar(3,5)
   # 預先計算物理 tile 靜態結構 (BL)
-  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 128L)
+  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 16L)
   
   list(
     columns_order = ord,
@@ -335,7 +335,7 @@ precompute_bl_info <- function(physical_tiles) {
 ## 4.3 核心模擬函式 (修正版：支援 Mixed Trees in Tile)
 ############################################################
 
-simulate_cam_array_mismatch <- function(fit, data_test, res, tile_cols = 128L) {
+simulate_cam_array_mismatch <- function(fit, data_test, res, tile_cols = 16L) {
   row_tiles    <- res$row_tiles
   paths_ranked <- res$paths_ranked
   
@@ -568,19 +568,7 @@ main_simulation <- function(fit,  data_test) {
   
   # 4. 動態功耗模擬
   cat("Running dynamic simulation on test data...\n")
-  res_dynamic <- simulate_cam_array_mismatch(fit, data_test, res_static, tile_cols = 128L)
-  purity_stats <- calculate_tile_purity(res_static)
-
-# 如果你想畫圖 (Boxplot 比較不同方法的純度分布)
-  library(ggplot2)
-  ggplot(purity_stats, aes(x = method, y = ratio, fill = method)) +
-    geom_boxplot() +
-    labs(title = "Tile Purity Distribution",
-         y = "Dominant Tree Ratio (Purity)",
-         x = "Method") +
-    theme_minimal()
-
-
+  res_dynamic <- simulate_cam_array_mismatch(fit, data_test, res_static, tile_cols = 16L)
   cat("finish the simulation\n")
   progress_bar(5,5)
   list(static = res_static, dynamic = res_dynamic)

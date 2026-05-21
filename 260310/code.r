@@ -1,6 +1,84 @@
-############################################################
-## 0. 基礎工具
-############################################################
+calculate_tile_purity <- function(res_static) {
+  # 檢查輸入
+  if (is.null(res_static) || is.null(res_static$row_tiles)) {
+    stop("Input error: res_static must contain 'row_tiles'.")
+  }
+  
+  df <- res_static$row_tiles
+  
+  # 我們要對每一列 (每一個 Tile) 進行計算
+  # 回傳一個詳細的 Data Frame
+  
+  purity_list <- lapply(seq_len(nrow(df)), function(i) {
+    
+    # 1. 取得該 Tile 內所有 Path 所屬的 Tree ID
+    # tree_ids_in_tile 是一個 list-column，所以要用 [[i]] 取出向量
+    t_ids <- unlist(df$tree_ids_in_tile[[i]])
+    
+    # 防呆：如果 Tile 是空的 (雖然不應該發生)
+    if (length(t_ids) == 0) {
+      return(data.frame(
+        method = df$method[i],
+        tile_id = df$tile_id[i],
+        dominant_tree = NA,
+        max_count = 0,
+        total_count = 0,
+        ratio = 0
+      ))
+    }
+    
+    # 2. 統計頻率 (Frequency Count)
+    # table() 會計算每個 Tree ID 出現幾次
+    counts <- table(t_ids)
+    
+    # 3. 找出最大值 (Most Frequent)
+    max_count <- max(counts)
+    
+    # 找出是哪一棵樹 (如果有平手，取第一個)
+    dom_tree <- names(counts)[which.max(counts)]
+    
+    # 4. 計算總數 (其實就是 length(t_ids) 或 rows_in_tile)
+    total_count <- sum(counts)
+    
+    # 5. 計算比例
+    ratio <- max_count / total_count
+    
+    data.frame(
+      method = df$method[i],
+      tile_id = df$tile_id[i],
+      dominant_tree = as.integer(dom_tree),
+      max_count = as.integer(max_count),
+      total_count = as.integer(total_count),
+      ratio = ratio
+    )
+  })
+  
+  # 合併成大表格
+  purity_df <- do.call(rbind, purity_list)
+  
+  # --- 輸出統計報告 ---
+  cat("========================================\n")
+  cat("       Tile Purity Analysis Report      \n")
+  cat("   (Ratio of Dominant Tree in Tile)     \n")
+  cat("========================================\n")
+  
+  methods <- unique(purity_df$method)
+  
+  for (m in methods) {
+    sub_df <- purity_df[purity_df$method == m, ]
+    avg_ratio <- mean(sub_df$ratio)
+    median_ratio <- median(sub_df$ratio)
+    
+    cat(sprintf("Method: %-10s\n", m))
+    cat(sprintf("  - Mean Purity   : %.4f\n", avg_ratio))
+    cat(sprintf("  - Median Purity : %.4f\n", median_ratio))
+    cat(sprintf("  - Min / Max     : %.4f / %.4f\n", min(sub_df$ratio), max(sub_df$ratio)))
+    cat("----------------------------------------\n")
+  }
+  
+  return(purity_df)
+}
+
 
 progress_bar <- function(current, total, len = 50) {
   percent <- current / total
@@ -144,28 +222,142 @@ build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
 }
 
 ############################################################
-## 2. Row Grouping (Only Sequential)
+## 2.2 Row Grouping (Real FP-Tree Construction + Union Window)
 ############################################################
 
-# 這是唯一保留的分組邏輯：依序切分
-pack_all_tiles_sequential <- function(paths_ranked, tile_rows = 128L) {
+pack_all_tiles_fptree_union <- function(paths_ranked, tile_rows = 128L, window_size = 512L) {
   n_paths <- length(paths_ranked)
-  # 直接按 1..N 切分，不進行排序
-  order_rows <- seq_len(n_paths)
   
-  group_idx <- (order_rows - 1L) %/% tile_rows + 1L
-  chunks <- split(order_rows, group_idx)
+  # 根據要求：只使用前 128 個 Feature 建樹，後面的直接 dropout
+  max_prefix_len <- 128L 
   
-  do.call(rbind, lapply(names(chunks), function(nm) {
-    rows <- chunks[[nm]]
-    df <- data.frame(tile_id = as.integer(nm), rows_in_tile = length(rows))
-    df$rows_idx <- I(list(rows))
-    df
-  }))
+  cat("    -> Constructing Real FP-Tree (Max Feature = 128)...\n")
+  
+  # --- 步驟 1: 建立真實的 FP-Tree ---
+  # 使用 environment 來模擬指標 (pointers)，建立真實的樹狀節點
+  root <- new.env(parent = emptyenv())
+  root$children <- new.env(parent = emptyenv())
+  root$path_ids <- integer(0)
+  
+  for (i in seq_len(n_paths)) {
+    feats <- paths_ranked[[i]]
+    # Dropout 後面的特徵
+    valid_feats <- feats[feats <= max_prefix_len]
+    
+    curr_node <- root
+    
+    if (length(valid_feats) > 0) {
+      for (f in valid_feats) {
+        fname <- as.character(f)
+        # 如果子節點不存在，則創建新的真實節點
+        if (!exists(fname, envir = curr_node$children, inherits = FALSE)) {
+          new_child <- new.env(parent = emptyenv())
+          new_child$children <- new.env(parent = emptyenv())
+          new_child$path_ids <- integer(0)
+          assign(fname, new_child, envir = curr_node$children)
+        }
+        # 指標往下移動 (Traversal)
+        curr_node <- get(fname, envir = curr_node$children, inherits = FALSE)
+      }
+    }
+    # 抵達該路徑在 FP-Tree 的終點，將 Path ID 存入節點
+    curr_node$path_ids <- c(curr_node$path_ids, i)
+  }
+  
+  cat("    -> Traversing FP-Tree (DFS)...\n")
+  
+  # --- 步驟 2: 對真實 FP-Tree 進行深度優先搜尋 (DFS) ---
+  order_idx <- integer(n_paths)
+  ptr <- 1L
+  
+  # 定義 DFS 遞迴函數
+  dfs <- function(node) {
+    # 如果這個節點有存放路徑，將其依序取出
+    if (length(node$path_ids) > 0) {
+      len <- length(node$path_ids)
+      order_idx[ptr:(ptr + len - 1L)] <<- node$path_ids
+      ptr <<- ptr + len
+    }
+    
+    # 取得所有子節點的名字 (即 Feature ID)
+    cnames <- ls(node$children, all.names = TRUE)
+    if (length(cnames) > 0) {
+      # 將名字轉回整數進行排序，確保高頻特徵 (ID 較小) 優先走訪
+      cnames_int <- as.integer(cnames)
+      cnames <- as.character(sort(cnames_int))
+      
+      for (cn in cnames) {
+        child_node <- get(cn, envir = node$children, inherits = FALSE)
+        dfs(child_node)
+      }
+    }
+  }
+  
+  # 從 Root 啟動 DFS
+  dfs(root)
+  order_idx <- order_idx[1:(ptr - 1L)]
+  
+  # --- 步驟 3: Sliding Window + Union Best-Fit ---
+  cat(sprintf("    -> Packing tiles with Sliding Window (size=%d)...\n", window_size))
+  
+  unassigned_idx <- order_idx
+  res_tiles <- list()
+  tile_counter <- 1L
+  total_tiles_estimate <- ceiling(n_paths / tile_rows)
+  
+  while (length(unassigned_idx) > 0) {
+    current_window_size <- min(length(unassigned_idx), window_size)
+    window_pool <- unassigned_idx[1:current_window_size]
+    
+    if (length(window_pool) <= tile_rows) {
+      selected_for_tile <- window_pool
+      unassigned_idx <- unassigned_idx[-(1:length(selected_for_tile))]
+    } else {
+      # 挑選 Base Path (長度最短)
+      path_lengths <- lengths(paths_ranked[window_pool])
+      base_local_idx <- which.min(path_lengths)
+      base_idx <- window_pool[base_local_idx]
+      
+      selected_for_tile <- integer(tile_rows)
+      selected_for_tile[1] <- base_idx
+      current_mask <- paths_ranked[[base_idx]]
+      window_pool <- window_pool[-base_local_idx]
+      
+      # Union 精細挑選
+      for (k in 2:tile_rows) {
+        costs <- vapply(window_pool, function(idx) {
+          sum(!(paths_ranked[[idx]] %in% current_mask))
+        }, numeric(1))
+        
+        best_local_idx <- which.min(costs)
+        best_idx <- window_pool[best_local_idx]
+        
+        selected_for_tile[k] <- best_idx
+        current_mask <- unique(c(current_mask, paths_ranked[[best_idx]]))
+        window_pool <- window_pool[-best_local_idx]
+      }
+      unassigned_idx <- setdiff(unassigned_idx, selected_for_tile)
+    }
+    
+    res_tiles[[tile_counter]] <- data.frame(
+      tile_id = tile_counter, 
+      rows_in_tile = length(selected_for_tile)
+    )
+    res_tiles[[tile_counter]]$rows_idx <- I(list(selected_for_tile))
+    
+    if (tile_counter %% 10 == 0) progress_bar(min(tile_counter, total_tiles_estimate), total_tiles_estimate)
+    tile_counter <- tile_counter + 1L
+  }
+  progress_bar(total_tiles_estimate, total_tiles_estimate)
+  
+  do.call(rbind, res_tiles)
 }
 
+
+
+
 ############################################################
-## 3. 核心比較邏輯 (修改為只跑 Sequential)
+## 3. 核心比較邏輯 
 ############################################################
 
 compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, path_tree_id, leaf_ids_list) {
@@ -176,13 +368,13 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   paths_ranked <- remap_paths_to_rank(paths_list, ord, one_based = one_based)
   attr(paths_ranked, "n_features") <- n_features
   
-  cat("Packing tiles (Sequential only)...\n")
+  cat("Packing tiles (FP-Tree)...\n")
   progress_bar(2, 5)
-  
-  # 2. Grouping: 僅執行 Sequential
-  seq_df <- pack_all_tiles_sequential(paths_ranked)
-  seq_df$method <- "sequential"
-  
+  cat("\n[Method 1] Real FP-Tree + Union (Window=512, Dropout > 128)...\n")
+  fptree_union_df <- pack_all_tiles_fptree_union(paths_ranked, tile_rows = 128L, window_size = 512L)
+  fptree_union_df$method <- "fptree_union"
+
+
   # 附加 Meta Info
   append_meta <- function(df) {
     df$tree_ids_in_tile <- lapply(df$rows_idx, function(idx) path_tree_id[idx])
@@ -192,7 +384,7 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   
   # 這裡只會有 sequential 的結果
   all_row_tiles <- rbind(
-    append_meta(seq_df)
+	append_meta(fptree_union_df)	
   )
   
   cat("build physical tile\n")
@@ -261,6 +453,8 @@ precompute_bl_info <- function(physical_tiles) {
   row.names(bl_vec) <- physical_tiles$key
   bl_vec
 }
+
+
 
 simulate_cam_array_mismatch <- function(fit, data_test, res, leaf_info_list, tile_cols = 128L) {
   row_tiles    <- res$row_tiles
@@ -480,3 +674,4 @@ sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
 sim_gas <- main_simulation(gas_forest100,gas_test_x)
 
 sim_cov <- main_simulation(cov_forest_100,cov_test_x)
+save.image(file = "backup_fptree_radix_20260310.RData")

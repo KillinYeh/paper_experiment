@@ -39,24 +39,24 @@ show_resources <- function(res_static) {
   if (is.null(res_static) || is.null(res_static$physical_tiles) || is.null(res_static$paths_ranked)) {
     stop("Input error: The input must be the result list (res_static) containing 'physical_tiles' and 'paths_ranked'.")
   }
-
+  
   # 1. 計算總 Path 數
   # paths_ranked 是一個 list，每個 element 代表一條從 Root 到 Leaf 的路徑
   total_paths <- length(res_static$paths_ranked)
-
+  
   # 2. 計算總 Tile 數
   # physical_tiles 是一個 data.frame
   # 它的每一列 (row) 都代表一個實體的硬體 Tile (包含 row grouping 和 column splitting 的結果)
   total_physical_tiles <- nrow(res_static$physical_tiles)
-
+  
   # --- 額外資訊 (Optional) ---
   # 邏輯陣列數 (Logical Arrays): 也就是縱向切了幾刀 (Row Grouping)
   # 這代表我們用了幾個 Array ID
   n_logical_arrays <- length(unique(res_static$physical_tiles$array_id))
-
+  
   # 橫向切分最大值 (Column Splits): 也就是特徵太多時，橫向切了幾刀
   n_col_splits <- max(res_static$physical_tiles$tile_in_array)
-
+  
   # --- 輸出報告 ---
   cat("========================================\n")
   cat(sprintf("1. Total Paths (Rules)     : %d\n", total_paths))
@@ -65,7 +65,7 @@ show_resources <- function(res_static) {
   cat(sprintf("   - Logical Row Groups    : %d (Arrays)\n", n_logical_arrays))
   cat(sprintf("   - Max Column Splits     : %d (Tiles wide)\n", n_col_splits))
   cat("========================================\n")
-
+  
   # 回傳一個 data frame 方便後續畫圖或紀錄
   return(data.frame(
     total_paths = total_paths,
@@ -74,7 +74,6 @@ show_resources <- function(res_static) {
     max_col_splits = n_col_splits
   ))
 }
-
 ############################################################
 ## 1. 靜態 WL/BL 統計
 ############################################################
@@ -114,7 +113,7 @@ wlbl_stats_for_window <- function(paths_ranked, rows_idx, start, end) {
   )
 }
 
-build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
+build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 16L) {
   n_features <- attr(paths_ranked, "n_features")
   if (n_features <= 0L || nrow(row_tiles) == 0L) return(NULL)
   
@@ -148,7 +147,7 @@ build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
 ############################################################
 
 # 這是唯一保留的分組邏輯：依序切分
-pack_all_tiles_sequential <- function(paths_ranked, tile_rows = 128L) {
+pack_all_tiles_sequential <- function(paths_ranked, tile_rows = 16L) {
   n_paths <- length(paths_ranked)
   # 直接按 1..N 切分，不進行排序
   order_rows <- seq_len(n_paths)
@@ -197,7 +196,7 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   
   cat("build physical tile\n")
   progress_bar(3, 5)
-  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 128L)
+  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 16L)
   
   list(
     columns_order = ord,          #feature after sorted by feature frequency
@@ -262,7 +261,7 @@ precompute_bl_info <- function(physical_tiles) {
   bl_vec
 }
 
-simulate_cam_array_mismatch <- function(fit, data_test, res, leaf_info_list, tile_cols = 128L) {
+simulate_cam_array_mismatch <- function(fit, data_test, res, leaf_info_list, tile_cols = 16L) {
   row_tiles    <- res$row_tiles
   paths_ranked <- res$paths_ranked
   
@@ -425,8 +424,8 @@ main_simulation <- function(fit,  data_test) {
   
   # 1. 提取 (一次 DFS)
   extracted <- extract_forest_info_optimized(fit, n_features)
-  
   # 2. 靜態 Mapping (Sequential Only)
+
   # 保持函數名稱為 compare_proposed_vs_naive
   res_static <- compare_proposed_vs_naive(
     paths_list = extracted$paths,
@@ -436,7 +435,7 @@ main_simulation <- function(fit,  data_test) {
     leaf_ids_list = extracted$leaf_ids
   )
   show_resources(res_static)
-  
+
   purity_stats <- calculate_tile_purity(res_static)
 
   # 如果你想畫圖 (Boxplot 比較不同方法的純度分布)
@@ -448,12 +447,12 @@ main_simulation <- function(fit,  data_test) {
          x = "Method") +
     theme_minimal()
 
-  #3. 動態模擬
+  # 3. 動態模擬
   cat("Running dynamic simulation...\n")
   res_dynamic <- simulate_cam_array_mismatch(
     fit, data_test, res_static, 
     leaf_info_list = extracted$leaf_info_list,
-    tile_cols = 128L
+    tile_cols = 16L
   )
   cat("finish the simulation\n")
   progress_bar(5, 5)
@@ -478,5 +477,7 @@ sim_gesture <- main_simulation(gesture_forest100,gesture_test_x)
 sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
   
 sim_gas <- main_simulation(gas_forest100,gas_test_x)
+
+save.image(file = "backup_20260201.RData")
 
 sim_cov <- main_simulation(cov_forest_100,cov_test_x)

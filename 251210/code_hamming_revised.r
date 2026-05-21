@@ -72,7 +72,7 @@ wlbl_stats_for_window <- function(paths_ranked, rows_idx, start, end) {
   )
 }
 
-closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_cols = 128L) {
+closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_cols = 16L) {
   n_features <- attr(paths_ranked, "n_features")
   if (n_features <= 0L) return(c(closed = 0L, total = 0L))
   
@@ -96,7 +96,7 @@ closed_cols_across_windows_for_tile <- function(paths_ranked, rows_idx, tile_col
   c(closed = total_closed, total = total_cols)
 }
 
-build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
+build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 16L) {
   n_features <- attr(paths_ranked, "n_features")
   if (n_features <= 0L || nrow(row_tiles) == 0L) return(NULL)
   
@@ -129,60 +129,96 @@ build_physical_tiles <- function(paths_ranked, row_tiles, tile_cols = 128L) {
 ## 2. Row Grouping (Proposed / Naive)
 ############################################################
 
-pack_all_tiles_proposed <- function(paths_ranked, tile_rows = 128L, tile_cols = 128L) {
-  # 簡單實作：以全域長度當種子，用 Hamming 找最近鄰
+
+pack_all_tiles_union <- function(paths_ranked, tile_rows = 16L, tile_cols = 16L) {
+  # 1. 預處理：將所有 path 轉為整數向量，方便計算
   idx_full <- lapply(paths_ranked, function(v) if (!length(v)) integer(0L) else unique(as.integer(v)))
-  len_full <- vapply(idx_full, length, integer(1))
-  
-  used  <- rep(FALSE, length(paths_ranked))
+
+  # 2. 優先順序：短路徑優先 (Length Ascending)
+  # 理由：短路徑通常是長路徑的子集 (Subset)，先定下來當基底，長路徑進來時增量可能為 0
+  lens <- vapply(idx_full, length, integer(1))
+
+  # 建立一個全局的處理順序 (尚未被使用的 indices)
+  # 我們不直接改變 paths_ranked 的順序，而是用一個 indices 列表來控制
+  sorted_indices <- order(lens, decreasing = FALSE)
+
+  n_paths <- length(paths_ranked)
+  used_flags <- rep(FALSE, n_paths) # 用來標記原始 index 是否已使用
+
   tiles <- list()
   tile_id <- 0L
-  
-  while (any(!used)) {
+
+  # 為了加速全域掃描，我們只在還沒用過的 indices 中搜尋
+
+  while(any(!used_flags)) {
     tile_id <- tile_id + 1L
-    cand <- which(!used)
-    seed <- cand[which.min(len_full[cand])]
-    
-    rows <- seed
-    used[seed] <- TRUE
-    
-    if (length(cand) > 1L) {
-      a <- idx_full[[seed]]
-      others <- setdiff(cand, seed)
-      if (length(others)) {
-        dists <- vapply(others, function(j) {
-          bj <- idx_full[[j]]
-          hamming_sets(a, bj)
-        }, integer(1))
-        
-        take <- head(others[order(dists, decreasing = FALSE)], max(0L, tile_rows - 1L))
-        if (length(take)) {
-          rows <- c(rows, take)
-          used[take] <- TRUE
-        }
+    rows <- integer(0L)
+
+    # --- Step 1: 選種子 (Seed) ---
+    # 從排序好的清單中，挑選第一個還沒被使用的 (即最短的)
+    seed_ptr <- which(!used_flags[sorted_indices])[1]
+
+    if (is.na(seed_ptr)) break # 全部做完
+
+    seed_idx <- sorted_indices[seed_ptr]
+
+    # 初始化 Tile
+    rows <- c(rows, seed_idx)
+    used_flags[seed_idx] <- TRUE
+
+    # 目前 Tile 開啟的 BL (Target Mask)
+    current_mask <- idx_full[[seed_idx]]
+
+    # --- Step 2: 填滿 Tile (Greedy Union Increment) ---
+    while(length(rows) < tile_rows && any(!used_flags)) {
+
+      # 找出所有還沒被使用的候選人
+      cand_indices <- which(!used_flags)
+      #if( length(cand_indices) > 5000) {cand_indices <- cand_indices[1:5000]}
+
+      # 全域掃描：計算每個候選人對 current_mask 的"增量"
+      # Increment = length(union(cand, mask)) - length(mask)
+      #           = length(setdiff(cand, mask))
+      # 即：候選人有多少特徵是目前 Mask 沒有的
+
+      increments <- vapply(cand_indices, function(i) {
+        p <- idx_full[[i]]
+        # 計算 p 中有多少個元素不在 current_mask 中
+        sum(! (p %in% current_mask) )
+      }, integer(1))
+
+      # 策略：找增量最小的
+      min_inc <- min(increments)
+
+      # 如果有多個最小增量，挑選其中最短的 (Secondary Sort Key: Length)
+      # 這有助於保持 Tile 內的特徵數不要暴增太快
+      candidates_with_min_inc <- which(increments == min_inc)
+
+      # 在這些最佳候選人中，找原始長度最短的
+      # 我們需要回頭查 idx_full 的長度
+      best_cand_local_idx <- candidates_with_min_inc[which.min(lens[cand_indices[candidates_with_min_inc]])]
+
+      best_cand_global_idx <- cand_indices[best_cand_local_idx]
+
+      # 加入 Tile
+      rows <- c(rows, best_cand_global_idx)
+      used_flags[best_cand_global_idx] <- TRUE
+
+      # 更新 Mask (將新特徵加入)
+      if (min_inc > 0) {
+        new_feats <- idx_full[[best_cand_global_idx]]
+        current_mask <- unique(c(current_mask, new_feats))
       }
     }
+
+    # 存檔
     tiles[[tile_id]] <- data.frame(tile_id = tile_id, rows_in_tile = length(rows))
     tiles[[tile_id]]$rows_idx <- I(list(rows))
+
   }
   do.call(rbind, tiles)
 }
 
-pack_all_tiles_naive <- function(paths_ranked, tile_rows = 128L, tile_cols = 128L) {
-  lens <- vapply(paths_ranked, length, integer(1))
-  order_rows <- order(lens, decreasing = FALSE)
-  
-  tiles <- list()
-  tile_id <- 0L
-  for (i in seq(1, length(order_rows), by = tile_rows)) {
-    tile_id <- tile_id + 1L
-    rows <- order_rows[i : min(i + tile_rows - 1L, length(order_rows))]
-    tiles[[tile_id]] <- data.frame(tile_id = tile_id, rows_in_tile = length(rows))
-    tiles[[tile_id]]$rows_idx <- I(list(rows))
- 
-  }
-  do.call(rbind, tiles)
-}
 
 ############################################################
 ## 3. 核心比較邏輯 (靜態部分)
@@ -196,13 +232,11 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
   paths_ranked <- remap_paths_to_rank(paths_list, ord, one_based = one_based)
   attr(paths_ranked, "n_features") <- n_features
   
-  cat("using proposed/naive to pack the path\n")
+  cat("using union to pack the path\n")
   progress_bar(2,5)
   # Grouping
-  prop_df  <- pack_all_tiles_proposed(paths_ranked)
-  prop_df$method <- "proposed"
-  naive_df <- pack_all_tiles_naive(paths_ranked)
-  naive_df$method <- "naive"
+  prop_df  <- pack_all_tiles_union(paths_ranked)
+  prop_df$method <- "union"
   
   # 紀錄每個 array 包含的 tree 和 leaf 資訊 (為了動態模擬查表)
   append_meta <- function(df) {
@@ -211,14 +245,12 @@ compare_proposed_vs_naive <- function(paths_list, n_features, one_based = TRUE, 
     df
   }
   prop_df  <- append_meta(prop_df)
-  naive_df <- append_meta(naive_df)
   
-  # 合併
-  all_row_tiles <- rbind(prop_df, naive_df)
+  all_row_tiles <- prop_df
   cat("build physical tile\n")
   progress_bar(3,5)
   # 預先計算物理 tile 靜態結構 (BL)
-  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 128L)
+  physical_tiles <- build_physical_tiles(paths_ranked, all_row_tiles, tile_cols = 16L)
   
   list(
     columns_order = ord,
@@ -335,7 +367,7 @@ precompute_bl_info <- function(physical_tiles) {
 ## 4.3 核心模擬函式 (修正版：支援 Mixed Trees in Tile)
 ############################################################
 
-simulate_cam_array_mismatch <- function(fit, data_test, res, tile_cols = 128L) {
+simulate_cam_array_mismatch <- function(fit, data_test, res, tile_cols = 16L) {
   row_tiles    <- res$row_tiles
   paths_ranked <- res$paths_ranked
   
@@ -566,9 +598,6 @@ main_simulation <- function(fit,  data_test) {
     leaf_ids_list = extracted$leaf_ids
   )
   
-  # 4. 動態功耗模擬
-  cat("Running dynamic simulation on test data...\n")
-  res_dynamic <- simulate_cam_array_mismatch(fit, data_test, res_static, tile_cols = 128L)
   purity_stats <- calculate_tile_purity(res_static)
 
 # 如果你想畫圖 (Boxplot 比較不同方法的純度分布)
@@ -580,7 +609,9 @@ main_simulation <- function(fit,  data_test) {
          x = "Method") +
     theme_minimal()
 
-
+  ## 4. 動態功耗模擬
+  cat("Running dynamic simulation on test data...\n")
+  res_dynamic <- simulate_cam_array_mismatch(fit, data_test, res_static, tile_cols = 16L)
   cat("finish the simulation\n")
   progress_bar(5,5)
   list(static = res_static, dynamic = res_dynamic)
@@ -605,3 +636,4 @@ sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
 
 sim_gas <- main_simulation(gas_forest100,gas_test_x)
 
+sim_cov <- main_simulation(cov_forest_100,cov_test_x)

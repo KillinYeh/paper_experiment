@@ -1,0 +1,328 @@
+#------------------ Result (When tile size equal to 128*128)------------------
+fetal		oo		ox		xo		xx
+
+seq	      385563400  	22880300         0         0 
+optimal	      392475600  	15968100         0         0
+naive 	      400610100   	7833600          0         0 
+union	      270050100 	138393600         0         0
+
+gene
+
+seq	      11215953  	398163227  	27892235	6143961166
+optimal       30175186  	379203994   	46805354 	6125048047 
+naive 	      32582627  	376796553 	49499681 	6122353720 
+union         12717971  	396661209  	28145761 	6143707640 
+
+gesture
+
+seq 	      10291152250   	121806150         0           0 
+optimal       10387678400       25280000          0           0
+naive         10409419200       3539200           0           0 
+union         6879572800 	3533385600        0          0
+
+gas
+
+seq  	      5420412000 	3097476000        0          0 
+optimal       7047154800 	1470733200        0          0 
+naive         7440026400	1077861600        0          0 
+union         4479847200 	4038040800        0          0
+
+email
+
+seq	      1681534038  	4719363350 	 2893904952	97034093815 
+optimal       3653841990  	2747055398 	 7296558405 	92631440362
+naive	      4408824729  	1992072659 	11591817801 	88336180966
+union         1778544573  	4622352815  	 3117591237 	96810407530
+
+mush
+
+seq	      10662618480		0	  0	      0
+optimal	      9620996592 	1041621888        0           0 
+naive  	      10661235184       1383296           0           0
+union         9431485040 	1231133440        0           0
+
+loan
+
+seq	      102649946    	865102         0         0 
+optimal	      99361192  	4153856        0         0
+naive	      102421928   	1093120        0         0
+union         75093928 		28421120        0        0
+
+===== Sum of oo + ox + xo + xx =====   //old data
+
+
+===== Meta data ==== 
+fetal
+
+1. Total Paths (Rules)     : 11441
+2. Total Physical Tiles    : 90
+----------------------------------------
+   - Logical Row Groups    : 90 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+
+gene
+
+1. Total Paths (Rules)     : 1991
+2. Total Physical Tiles    : 2576
+----------------------------------------
+   - Logical Row Groups    : 16 (Arrays)
+   - Max Column Splits     : 161 (Tiles wide)
+
+gesture
+
+1. Total Paths (Rules)     : 164762
+2. Total Physical Tiles    : 1288
+----------------------------------------
+   - Logical Row Groups    : 1288 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+gas
+
+1. Total Paths (Rules)     : 18485
+2. Total Physical Tiles    : 145
+----------------------------------------
+   - Logical Row Groups    : 145 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+email
+1. Total Paths (Rules)     : 34233
+2. Total Physical Tiles    : 6432
+----------------------------------------
+   - Logical Row Groups    : 268 (Arrays)
+   - Max Column Splits     : 24 (Tiles wide)
+
+mush
+
+1. Total Paths (Rules)     : 123330
+2. Total Physical Tiles    : 964
+----------------------------------------
+   - Logical Row Groups    : 964 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+loan
+
+1. Total Paths (Rules)     : 10101
+2. Total Physical Tiles    : 79
+----------------------------------------
+   - Logical Row Groups    : 79 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+
+
+#------------------ Result (When tile size equal to 16*16)--------------------
+fetal		oo		ox		xo		xx
+
+seq           238756344  	75201721 	27920956 	66564679 
+optimal       246359044  	67599021 	29467656	65017979 
+naive  	      284330638  	29627427  	42611662  	51873973
+
+
+gene
+
+seq	      1804958  		387021118    	4328659 	6188077846 
+optimal       2702678  		386123398    	5820501 	6186586004
+gesture       4217826  		384608250    	7878104 	6184528401
+
+seq  	      3776788674 	1871596638 	2484680226 	2279892862 
+optimal       4342351407 	1306033905 	2703397893 	2061175195
+naive	      4715533181  	932852131 	3434687469 	1329885619
+
+gas
+
+seq 	      585805859 	1663219245  	885805741 	5383057155 
+optimal       780629683 	1468395421 	1151313917 	5117548979
+naive         1007347489 	1241677615 	1640988911 	4627873985
+
+email
+
+seq	      307974093   	3337279967    	801101892 	101882540203 
+optimal       425153802   	3220100258   	1162711113 	101520930982
+naive         804099516   	2841154544   	2537618439 	100146023656 
+
+mush
+
+seq	      10523381092   	139237388       0               0 
+optimal	      9374596992 	1288021488      0          	0
+naive	      10357082976   	305535504       0   	        0
+
+loan
+
+seq	      84304318 		19210730        0       	0 
+optimal       71601068 		31913980        0        	0
+naive	      90383944 		13131104        0        	0 
+
+===== Sum of oo + ox + xo + xx (tile size = 16x16) ===== 
+fetal
+1. Total Paths (Rules)     : 11441
+2. Total Physical Tiles    : 1432
+----------------------------------------
+   - Logical Row Groups    : 716 (Arrays)
+   - Max Column Splits     : 2 (Tiles wide)
+
+
+gene
+
+1. Total Paths (Rules)     : 1991
+2. Total Physical Tiles    : 160500
+----------------------------------------
+   - Logical Row Groups    : 125 (Arrays)
+   - Max Column Splits     : 1284 (Tiles wide)
+
+gesture
+
+1. Total Paths (Rules)     : 164762
+2. Total Physical Tiles    : 20596
+----------------------------------------
+   - Logical Row Groups    : 10298 (Arrays)
+   - Max Column Splits     : 2 (Tiles wide)
+
+gas
+
+1. Total Paths (Rules)     : 18485
+2. Total Physical Tiles    : 9248
+----------------------------------------
+   - Logical Row Groups    : 1156 (Arrays)
+   - Max Column Splits     : 8 (Tiles wide)
+
+email
+1. Total Paths (Rules)     : 34233
+2. Total Physical Tiles    : 402320
+----------------------------------------
+   - Logical Row Groups    : 2140 (Arrays)
+   - Max Column Splits     : 188 (Tiles wide)
+
+mush
+
+1. Total Paths (Rules)     : 123330
+2. Total Physical Tiles    : 7709
+----------------------------------------
+   - Logical Row Groups    : 7709 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+loan
+
+1. Total Paths (Rules)     : 10101
+2. Total Physical Tiles    : 632
+----------------------------------------
+   - Logical Row Groups    : 632 (Arrays)
+   - Max Column Splits     : 1 (Tiles wide)
+
+
+# tree purity , method = seq
+
+fetal
+
+Method: sequential
+  - Mean Purity   : 0.7234
+  - Median Purity : 0.7188
+  - Min / Max     : 0.5000 / 1.0000
+
+
+gene
+
+  - Mean Purity   : 0.1940
+  - Median Purity : 0.1875
+  - Min / Max     : 0.1562 / 0.3380
+
+gesture
+
+Method: sequential
+  - Mean Purity   : 0.9795
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5000 / 1.0000
+
+gas
+
+Method: sequential
+  - Mean Purity   : 0.8298
+  - Median Purity : 0.8594
+  - Min / Max     : 0.5156 / 1.0000
+
+email
+
+Method: sequential
+  - Mean Purity   : 0.9073
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5156 / 1.0000
+
+mush
+
+Method: sequential
+  - Mean Purity   : 0.9728
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5000 / 1.0000
+
+loan
+
+Method: sequential
+  - Mean Purity   : 0.6762
+  - Median Purity : 0.6328
+  - Min / Max     : 0.4844 / 1.0000
+
+
+# Tree purity , method = union
+
+> sim_email <- main_simulation(email_forest100,email_test_x)
+Method: union     
+  - Mean Purity   : 0.6400
+  - Median Purity : 0.6250
+  - Min / Max     : 0.1094 / 1.0000
+----------------------------------------
+ 
+> sim_fetal <- main_simulation(fetal_forest100,fetal_x)
+Method: union     
+  - Mean Purity   : 0.1089
+  - Median Purity : 0.1016
+  - Min / Max     : 0.0625 / 0.2422
+----------------------------------------
+ 
+> sim_gene  <- main_simulation(gene_forest100,gene_test_x)
+Method: union     
+  - Mean Purity   : 0.1531
+  - Median Purity : 0.1562
+  - Min / Max     : 0.0781 / 0.2188
+----------------------------------------
+ 
+> sim_mush  <- main_simulation(mush_forest100,mush_test_x)
+Method: union     
+  - Mean Purity   : 0.6657
+  - Median Purity : 0.6797
+  - Min / Max     : 0.0703 / 1.0000
+----------------------------------------
+ 
+> sim_loan  <- main_simulation(loan_forest100,loan_test_x)
+
+Method: union     
+  - Mean Purity   : 0.1246
+  - Median Purity : 0.1094
+  - Min / Max     : 0.0625 / 0.3516
+----------------------------------------
+ 
+> sim_gesture <- main_simulation(gesture_forest100,gesture_test_x)
+
+Method: union     
+  - Mean Purity   : 0.1399
+  - Median Purity : 0.1328
+  - Min / Max     : 0.0547 / 0.4219
+----------------------------------------
+
+
+
+> sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
+Method: union     
+  - Mean Purity   : 0.1050
+  - Median Purity : 0.0859
+  - Min / Max     : 0.0703 / 0.2500
+----------------------------------------
+> 
+
+
+
+> sim_gas <- main_simulation(gas_forest100,gas_test_x)
+Method: union     
+  - Mean Purity   : 0.1680
+  - Median Purity : 0.1562
+  - Min / Max     : 0.0781 / 0.3984
+----------------------------------------
+

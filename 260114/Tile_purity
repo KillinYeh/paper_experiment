@@ -1,0 +1,121 @@
+#-------- Tile size == 128 ---------
+
+# tree purity , method = seq
+
+
+fetal
+
+Method: sequential
+  - Mean Purity   : 0.7234
+  - Median Purity : 0.7188
+  - Min / Max     : 0.5000 / 1.0000
+
+
+gene
+
+  - Mean Purity   : 0.1940
+  - Median Purity : 0.1875
+  - Min / Max     : 0.1562 / 0.3380
+
+gesture
+
+Method: sequential
+  - Mean Purity   : 0.9795
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5000 / 1.0000
+
+gas
+
+Method: sequential
+  - Mean Purity   : 0.8298
+  - Median Purity : 0.8594
+  - Min / Max     : 0.5156 / 1.0000
+
+email
+
+Method: sequential
+  - Mean Purity   : 0.9073
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5156 / 1.0000
+
+mush
+
+Method: sequential
+  - Mean Purity   : 0.9728
+  - Median Purity : 1.0000
+  - Min / Max     : 0.5000 / 1.0000
+
+loan
+
+Method: sequential
+  - Mean Purity   : 0.6762
+  - Median Purity : 0.6328
+  - Min / Max     : 0.4844 / 1.0000
+
+
+# Tree purity , method = union
+
+> sim_email <- main_simulation(email_forest100,email_test_x)
+Method: union
+  - Mean Purity   : 0.6400
+  - Median Purity : 0.6250
+  - Min / Max     : 0.1094 / 1.0000
+----------------------------------------
+
+> sim_fetal <- main_simulation(fetal_forest100,fetal_x)
+Method: union
+  - Mean Purity   : 0.1089
+  - Median Purity : 0.1016
+  - Min / Max     : 0.0625 / 0.2422
+----------------------------------------
+
+> sim_gene  <- main_simulation(gene_forest100,gene_test_x)
+Method: union
+  - Mean Purity   : 0.1531
+  - Median Purity : 0.1562
+  - Min / Max     : 0.0781 / 0.2188
+----------------------------------------
+
+> sim_mush  <- main_simulation(mush_forest100,mush_test_x)
+Method: union
+  - Mean Purity   : 0.6657
+  - Median Purity : 0.6797
+  - Min / Max     : 0.0703 / 1.0000
+----------------------------------------
+
+> sim_loan  <- main_simulation(loan_forest100,loan_test_x)
+
+Method: union
+  - Mean Purity   : 0.1246
+  - Median Purity : 0.1094
+  - Min / Max     : 0.0625 / 0.3516
+----------------------------------------
+
+> sim_gesture <- main_simulation(gesture_forest100,gesture_test_x)
+
+Method: union
+  - Mean Purity   : 0.1399
+  - Median Purity : 0.1328
+  - Min / Max     : 0.0547 / 0.4219
+----------------------------------------
+
+
+
+> sim_arcene <- main_simulation(arcene_forest100,arcene_test_x)
+Method: union
+  - Mean Purity   : 0.1050
+  - Median Purity : 0.0859
+  - Min / Max     : 0.0703 / 0.2500
+----------------------------------------
+>
+
+
+
+> sim_gas <- main_simulation(gas_forest100,gas_test_x)
+Method: union
+  - Mean Purity   : 0.1680
+  - Median Purity : 0.1562
+  - Min / Max     : 0.0781 / 0.3984
+----------------------------------------
+
+#----------------- Tile size == 16 ------------------

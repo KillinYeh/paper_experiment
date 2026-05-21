@@ -1,0 +1,732 @@
+==========================================================
+ Power Measurement Results 
+ Date: 西元2026年03月27日 (週五) 19時19分33秒 CST
+==========================================================
+
+[Dataset: email | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R email seq':
+
+       623,682,824      cycles:u                                                              
+
+       0.189685255 seconds time elapsed
+
+       0.148281000 seconds user
+       0.042549000 seconds sys
+
+
+
+[Dataset: email | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R email naive':
+
+       631,423,249      cycles:u                                                              
+
+       0.188532159 seconds time elapsed
+
+       0.143227000 seconds user
+       0.046809000 seconds sys
+
+
+
+[Dataset: email | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R email mcp':
+
+       890,838,976      cycles:u                                                              
+
+       0.273100111 seconds time elapsed
+
+       0.195128000 seconds user
+       0.079263000 seconds sys
+
+
+
+[Dataset: email | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R email lsh':
+
+     3,101,331,429      cycles:u                                                              
+
+       0.746703707 seconds time elapsed
+
+       0.704805000 seconds user
+       0.043260000 seconds sys
+
+
+
+[Dataset: email | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R email radix':
+
+   168,555,647,063      cycles:u                                                              
+
+      38.242685009 seconds time elapsed
+
+      38.169533000 seconds user
+       0.070750000 seconds sys
+
+
+
+[Dataset: email | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R email fptree':
+
+   184,787,232,331      cycles:u                                                              
+
+      42.043405937 seconds time elapsed
+
+      41.933029000 seconds user
+       0.107755000 seconds sys
+
+
+
+[Dataset: email | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R email union':
+
+ 5,978,057,622,828      cycles:u                                                              
+
+    1365.039555793 seconds time elapsed
+
+    1364.578491000 seconds user
+       0.354155000 seconds sys
+
+
+
+[Dataset: fetal | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal seq':
+
+       472,930,378      cycles:u                                                              
+
+       0.153133084 seconds time elapsed
+
+       0.110757000 seconds user
+       0.043901000 seconds sys
+
+
+
+[Dataset: fetal | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal naive':
+
+       477,884,243      cycles:u                                                              
+
+       0.153515566 seconds time elapsed
+
+       0.118616000 seconds user
+       0.036363000 seconds sys
+
+
+
+[Dataset: fetal | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal mcp':
+
+       522,661,227      cycles:u                                                              
+
+       0.166205493 seconds time elapsed
+
+       0.130667000 seconds user
+       0.036961000 seconds sys
+
+
+
+[Dataset: fetal | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal lsh':
+
+     1,508,370,466      cycles:u                                                              
+
+       0.391252682 seconds time elapsed
+
+       0.357373000 seconds user
+       0.035274000 seconds sys
+
+
+
+[Dataset: fetal | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal radix':
+
+    37,455,350,150      cycles:u                                                              
+
+       8.624960391 seconds time elapsed
+
+       8.581230000 seconds user
+       0.043803000 seconds sys
+
+
+
+[Dataset: fetal | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal fptree':
+
+    40,021,437,240      cycles:u                                                              
+
+       9.216051414 seconds time elapsed
+
+       9.164558000 seconds user
+       0.052008000 seconds sys
+
+
+
+[Dataset: fetal | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R fetal union':
+
+   460,594,102,226      cycles:u                                                              
+
+     105.492405929 seconds time elapsed
+
+     105.421092000 seconds user
+       0.064159000 seconds sys
+
+
+
+[Dataset: gene | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R gene seq':
+
+       397,999,871      cycles:u                                                              
+
+       0.132395111 seconds time elapsed
+
+       0.091900000 seconds user
+       0.041863000 seconds sys
+
+
+
+[Dataset: gene | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R gene naive':
+
+       420,432,397      cycles:u                                                              
+
+       0.139210707 seconds time elapsed
+
+       0.102011000 seconds user
+       0.038643000 seconds sys
+
+
+
+[Dataset: gene | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R gene mcp':
+
+       447,980,314      cycles:u                                                              
+
+       0.147634231 seconds time elapsed
+
+       0.103908000 seconds user
+       0.045220000 seconds sys
+
+
+
+[Dataset: gene | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R gene lsh':
+
+       604,414,947      cycles:u                                                              
+
+       0.183334907 seconds time elapsed
+
+       0.143229000 seconds user
+       0.041367000 seconds sys
+
+
+
+[Dataset: gene | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R gene radix':
+
+     7,824,803,521      cycles:u                                                              
+
+       1.845533512 seconds time elapsed
+
+       1.792455000 seconds user
+       0.054307000 seconds sys
+
+
+
+[Dataset: gene | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R gene fptree':
+
+     7,978,705,284      cycles:u                                                              
+
+       1.878711626 seconds time elapsed
+
+       1.834713000 seconds user
+       0.045158000 seconds sys
+
+
+
+[Dataset: gene | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R gene union':
+
+    18,735,907,815      cycles:u                                                              
+
+       4.346203594 seconds time elapsed
+
+       4.286423000 seconds user
+       0.060689000 seconds sys
+
+
+
+[Dataset: mush | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R mush seq':
+
+     1,152,682,600      cycles:u                                                              
+
+       0.309407218 seconds time elapsed
+
+       0.268007000 seconds user
+       0.042863000 seconds sys
+
+
+
+[Dataset: mush | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R mush naive':
+
+     1,135,831,050      cycles:u                                                              
+
+       0.305790145 seconds time elapsed
+
+       0.257329000 seconds user
+       0.049807000 seconds sys
+
+
+
+[Dataset: mush | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R mush mcp':
+
+     1,498,428,788      cycles:u                                                              
+
+       0.395738514 seconds time elapsed
+
+       0.346838000 seconds user
+       0.050342000 seconds sys
+
+
+
+[Dataset: mush | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R mush lsh':
+
+    11,508,565,517      cycles:u                                                              
+
+       2.692946484 seconds time elapsed
+
+       2.637444000 seconds user
+       0.056676000 seconds sys
+
+
+
+[Dataset: mush | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R mush radix':
+
+   390,310,006,718      cycles:u                                                              
+
+      89.419069094 seconds time elapsed
+
+      89.347171000 seconds user
+       0.066224000 seconds sys
+
+
+
+[Dataset: mush | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R mush fptree':
+
+   403,682,545,845      cycles:u                                                              
+
+      92.558281162 seconds time elapsed
+
+      92.459214000 seconds user
+       0.092498000 seconds sys
+
+
+
+[Dataset: mush | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R mush union':
+
+51,337,504,910,007      cycles:u                                                              
+
+   11761.424022621 seconds time elapsed
+
+   11758.987178000 seconds user
+       1.437237000 seconds sys
+
+
+
+[Dataset: loan | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R loan seq':
+
+       455,662,545      cycles:u                                                              
+
+       0.148950322 seconds time elapsed
+
+       0.105862000 seconds user
+       0.044485000 seconds sys
+
+
+
+[Dataset: loan | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R loan naive':
+
+       482,306,668      cycles:u                                                              
+
+       0.155258487 seconds time elapsed
+
+       0.116973000 seconds user
+       0.039678000 seconds sys
+
+
+
+[Dataset: loan | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R loan mcp':
+
+       500,510,643      cycles:u                                                              
+
+       0.160596492 seconds time elapsed
+
+       0.122410000 seconds user
+       0.038655000 seconds sys
+
+
+
+[Dataset: loan | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R loan lsh':
+
+     1,352,607,183      cycles:u                                                              
+
+       0.357186350 seconds time elapsed
+
+       0.311867000 seconds user
+       0.046653000 seconds sys
+
+
+
+[Dataset: loan | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R loan radix':
+
+    31,292,129,681      cycles:u                                                              
+
+       7.227399490 seconds time elapsed
+
+       7.192593000 seconds user
+       0.035636000 seconds sys
+
+
+
+[Dataset: loan | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R loan fptree':
+
+    32,468,049,487      cycles:u                                                              
+
+       7.490725485 seconds time elapsed
+
+       7.438442000 seconds user
+       0.052942000 seconds sys
+
+
+
+[Dataset: loan | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R loan union':
+
+   345,157,618,025      cycles:u                                                              
+
+      79.204148132 seconds time elapsed
+
+      79.151587000 seconds user
+       0.046599000 seconds sys
+
+
+
+[Dataset: gesture | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture seq':
+
+     1,655,737,041      cycles:u                                                              
+
+       0.429969991 seconds time elapsed
+
+       0.376835000 seconds user
+       0.054414000 seconds sys
+
+
+
+[Dataset: gesture | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture naive':
+
+     1,693,047,482      cycles:u                                                              
+
+       0.438580223 seconds time elapsed
+
+       0.386706000 seconds user
+       0.053250000 seconds sys
+
+
+
+[Dataset: gesture | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture mcp':
+
+     2,351,527,001      cycles:u                                                              
+
+       0.623975943 seconds time elapsed
+
+       0.540725000 seconds user
+       0.084632000 seconds sys
+
+
+
+[Dataset: gesture | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture lsh':
+
+    16,126,755,456      cycles:u                                                              
+
+       3.762564040 seconds time elapsed
+
+       3.692208000 seconds user
+       0.071509000 seconds sys
+
+
+
+[Dataset: gesture | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture radix':
+
+   597,501,865,852      cycles:u                                                              
+
+     137.081460001 seconds time elapsed
+
+     136.972355000 seconds user
+       0.095513000 seconds sys
+
+
+
+[Dataset: gesture | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture fptree':
+
+   710,940,991,552      cycles:u                                                              
+
+     163.065552903 seconds time elapsed
+
+     162.674030000 seconds user
+       0.379779000 seconds sys
+
+
+
+[Dataset: gesture | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R gesture union':
+
+104,435,792,475,926      cycles:u                                                              
+
+   23923.015083323 seconds time elapsed
+
+   23919.803407000 seconds user
+       1.184957000 seconds sys
+
+
+
+[Dataset: arcene | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene seq':
+
+       393,871,497      cycles:u                                                              
+
+       0.130757048 seconds time elapsed
+
+       0.094158000 seconds user
+       0.038084000 seconds sys
+
+
+
+[Dataset: arcene | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene naive':
+
+       428,101,334      cycles:u                                                              
+
+       0.140036209 seconds time elapsed
+
+       0.096566000 seconds user
+       0.044792000 seconds sys
+
+
+
+[Dataset: arcene | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene mcp':
+
+       420,373,833      cycles:u                                                              
+
+       0.141451965 seconds time elapsed
+
+       0.097118000 seconds user
+       0.045884000 seconds sys
+
+
+
+[Dataset: arcene | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene lsh':
+
+       522,519,736      cycles:u                                                              
+
+       0.165314203 seconds time elapsed
+
+       0.128560000 seconds user
+       0.038285000 seconds sys
+
+
+
+[Dataset: arcene | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene radix':
+
+     3,875,396,116      cycles:u                                                              
+
+       0.942378998 seconds time elapsed
+
+       0.887766000 seconds user
+       0.056046000 seconds sys
+
+
+
+[Dataset: arcene | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene fptree':
+
+     3,968,126,617      cycles:u                                                              
+
+       0.961728676 seconds time elapsed
+
+       0.915244000 seconds user
+       0.047713000 seconds sys
+
+
+
+[Dataset: arcene | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R arcene union':
+
+     5,427,670,519      cycles:u                                                              
+
+       1.296001895 seconds time elapsed
+
+       1.245960000 seconds user
+       0.051323000 seconds sys
+
+
+
+[Dataset: gas | Method: seq]
+
+ Performance counter stats for 'Rscript measure_packing.R gas seq':
+
+       559,588,619      cycles:u                                                              
+
+       0.172015682 seconds time elapsed
+
+       0.136207000 seconds user
+       0.037376000 seconds sys
+
+
+
+[Dataset: gas | Method: naive]
+
+ Performance counter stats for 'Rscript measure_packing.R gas naive':
+
+       527,801,656      cycles:u                                                              
+
+       0.166660449 seconds time elapsed
+
+       0.132465000 seconds user
+       0.035791000 seconds sys
+
+
+
+[Dataset: gas | Method: mcp]
+
+ Performance counter stats for 'Rscript measure_packing.R gas mcp':
+
+       685,002,143      cycles:u                                                              
+
+       0.217322399 seconds time elapsed
+
+       0.165632000 seconds user
+       0.053101000 seconds sys
+
+
+
+[Dataset: gas | Method: lsh]
+
+ Performance counter stats for 'Rscript measure_packing.R gas lsh':
+
+     2,062,045,526      cycles:u                                                              
+
+       0.517928324 seconds time elapsed
+
+       0.469736000 seconds user
+       0.049446000 seconds sys
+
+
+
+[Dataset: gas | Method: radix]
+
+ Performance counter stats for 'Rscript measure_packing.R gas radix':
+
+    74,019,834,498      cycles:u                                                              
+
+      17.021291452 seconds time elapsed
+
+      16.958802000 seconds user
+       0.060735000 seconds sys
+
+
+
+[Dataset: gas | Method: fptree]
+
+ Performance counter stats for 'Rscript measure_packing.R gas fptree':
+
+    84,864,389,298      cycles:u                                                              
+
+      19.548574100 seconds time elapsed
+
+      19.428433000 seconds user
+       0.119271000 seconds sys
+
+
+
+[Dataset: gas | Method: union]
+
+ Performance counter stats for 'Rscript measure_packing.R gas union':
+
+ 1,480,428,784,644      cycles:u                                                              
+
+     339.273635987 seconds time elapsed
+
+     339.169874000 seconds user
+       0.075072000 seconds sys
+
+
